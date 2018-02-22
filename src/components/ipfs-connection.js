@@ -31,7 +31,7 @@ export default class Connection extends React.Component {
             ]
             },
             Bootstrap: [
-            "/ip4/192.168.0.27/tcp/4001/ipfs/QmWvsZ1ZxLMa5aB6MMtG8nJvFZ6HsiLgx5RpP9DX7qpjPo"
+                "/ip4/192.168.0.27/tcp/4001/ipfs/QmVWMufjtpwMz9zmdNhQrBSX8gssedcU9U24b7F1KdfRgg"
             ],
         }
     })
@@ -49,7 +49,17 @@ export default class Connection extends React.Component {
                     peer: peer,
                     usernameHash: "QmVWMufjtpwMz9zmdNhQrBSX8gssedcU9U24b7F1KdfRgg",
                     online: true
-                });                                                                                //change props of father
+                });  
+                let key = 'API.HTTPHeaders.Access-Control-Allow-Origin'
+                let val = ['*']
+                this.ipfs.config.set(key, val, function (err) { 
+                    if (err) {return console.error('ipfs sonfig.set error', err)}
+                });  
+                key = 'API.HTTPHeaders.Access-Control-Allow-Credentials'
+                val = ['true']
+                this.ipfs.config.set(key, val, function (err) { 
+                    if (err) {return console.error('ipfs sonfig.set error', err)}
+                }); 
             })
         });
     }
@@ -59,8 +69,8 @@ export default class Connection extends React.Component {
         <div>
             Peer id: {this.state.peer.id}
             {(this.state.online)?<Chatroom ipfs={this.ipfs} usernameHash={this.state.usernameHash} myPeerId={this.state.peer.id}/>:<img src={LoadingImg} alt=""/>}
-            {/* <UploadIPFS/> */}
-            {/* <DropOut ipfs={this.ipfs}/> */}
+            <UploadIPFS/>
+            <DropOut ipfs={this.ipfs}/>
         </div>
       );
     }
