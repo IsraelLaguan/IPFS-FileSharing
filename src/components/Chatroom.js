@@ -8,26 +8,26 @@ class Chatroom extends React.Component {
         super(props);
         this.ipfs = this.props.ipfs;
         this.topicLobby = "lobby.dev"; 
-        this.hashIncomingMsg = "";
-        this.msgStore = {};
+        this.incomingMsg = "";
+        this.dateIncomingMsg = "";
+        this.dateOncomingMsg = "";
         this.state = {
             msgHash: "none",
-            msgDate: "none",
-            msgCounter: 0,
+            msg: "",
             chats: [{
                 username: "Israel Laguan",
                 content: <p>Hello World!</p>,
-                img: "https://robohash.org/"+this.props.usernameHash+".png?set=set4",
+                img: "http://i.imgur.com/Tj5DGiO.jpg",
             }, {
                 username: "Alice Chen",
-                content: <p>Hello! Nice to see you!</p>,
+                content: <p>Definitely! Sounds great!</p>,
                 img: "http://i.imgur.com/Tj5DGiO.jpg",
             }],
         };
         this.submitMessage = this.submitMessage.bind(this);
         this.publishMsg = function () {
             let msg = new Buffer(JSON.stringify({
-                counter: this.state.msgCounter,
+                date: this.dateOncomingMsg,
                 myMsg: this.state.msg,
                 msgHash: this.state.msgHash,
                 usernameHash: this.props.usernameHash,
@@ -36,51 +36,33 @@ class Chatroom extends React.Component {
         }.bind(this);
 
         this.readMsg = function (msg) {
-            if (msg.from !== this.props.myPeerId && msg.data.counter > 0 ){
+            if (msg.from !== this.props.myPeerId){
                 try {msg.data = JSON.parse(msg.data.toString());} 
                 catch (e) {return;}
-                
-                if (msg.data.myMsg !== "none"){
-                    if (msg.from in this.msgStore){console.log(this.msgStore[msg.from])}
-                    else {console.log("problem in readMsg")}
-                    // if (msg.from in this.msgStore && msg.from){
-                    //     this.setState({
-                    //         chats: this.state.chats.concat([{
-                    //             username: from,
-                    //             content: <p>{info}</p>,
-                    //             img: "https://robohash.org/"+from+".png?set=set4",
-                    //         }])
-                    //     });
-                    // }
-                    this.handleRead(
-                        msg.data.usernameHash, msg.from, msg.data.msgHash, msg.data.counter
-                    );
-                    return;
+               
+                if (msg.data.date !== this.dateIncomingMsg && msg.data.date !== "" ){
+                    this.dateIncomingMsg= msg.data.date;
+                    this.handleRead(msg.data.usernameHash, msg.data.msgHash);
+                    return console.log(msg, msg.data.date, this.dateIncomingMsg);
                 }
-            }
+            console.log("...")  
 
+                
+            }
         }.bind(this);
 
-        this.handleRead = function (hashFrom, from, msgHash, counter){
-            this.ipfs.files.cat(msgHash, (err, data) => {
+        this.handleRead = function (from, hash){
+            this.ipfs.files.cat(hash, (err, data) => {
                 if (err) {throw err}
                 let info = data.toString();
                 console.log("read",info);
-                this.ipfs.files.cat(hashFrom, (err, data) => {
-                    if (err) {throw err}
-                    let from = data.toString();
-                    console.log("read",info);
-                    let keyname = from;
-                    Object.assign(this.msgStore, {
-                        [keyname]:{
-                            msg: info, 
-                            counter: counter, 
-                            msgHash: msgHash,
-                            usernameHash: hashFrom,
-                        }, 
+                this.setState({
+                    chats: this.state.chats.concat([{
+                        username: from,
+                        content: <p>{info}</p>,
+                        img: "https://robohash.org/"+from+".png?set=set4",
+                    }])
                     });
-                });
-                
             });
         }.bind(this);
     }
@@ -119,12 +101,10 @@ class Chatroom extends React.Component {
                 this.ipfs.files.cat(file.hash, (err, data) => {
                     if (err) { return console.error('ipfs cat error', err) }
                     console.log('successfully stored name:', data.toString(), file.hash)
-                    this.setState({msgHash: file.hash, msgDate: new Date().toString});                              ///////
+                    this.setState({msgHash: file.hash, msg: data.toString()});  
+                    this.dateOncomingMsg = new Date();
                 })
               }
-              this.setState((prevState, props) => ({
-                  msgCounter: prevState.msgCounter + 1,
-              }));
             })
         });
 
@@ -163,10 +143,3 @@ class Chatroom extends React.Component {
 }
 
 export default Chatroom;
-
-/* 
-
-podria en handleRead guardar en un objeto, y con otra funcion llamada desde ping 
-    comparar los mensajes y si no esta dibujarla
-    
-*/

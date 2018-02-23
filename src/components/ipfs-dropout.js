@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
 import Buffer from 'buffer';
 import webtorrent from 'webtorrent';
-import ipfsAPI from 'ipfs-api';
 
 export default class DropOut extends React.Component {
   constructor(props) {

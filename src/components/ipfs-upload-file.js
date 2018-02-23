@@ -1,14 +1,14 @@
 import React from 'react';
 import ipfsAPI from 'ipfs-api';
-var ipfs = ipfsAPI('/ip4/127.0.0.1/tcp/5001')
+// var ipfs = ipfsAPI('/ip4/127.0.0.1/tcp/5001')
 
 export default class UploadIPFS extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       added_file_hash: null
     }
-    
+    this.ipfs = this.props.ipfs;
 
     // bind methods
     this.captureFile = this.captureFile.bind(this)
@@ -29,7 +29,7 @@ export default class UploadIPFS extends React.Component {
   saveToIpfs (reader) {
     let ipfsId
     const buffer = Buffer.from(reader.result)
-    ipfs.add(buffer, (err, response) => {
+    this.ipfs.files.add(buffer, (err, response) => {
         if (err || !response) {return console.error('ipfs add error', err, response)}
         console.log(response)
         ipfsId = response[0].hash

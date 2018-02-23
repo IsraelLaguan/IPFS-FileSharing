@@ -1,6 +1,5 @@
 import React from 'react';
 import IPFS from 'ipfs';
-import Repo from 'ipfs-repo';
 import Chatroom from './Chatroom.js';
 import UploadIPFS from './ipfs-upload-file';
 import LoadingImg from './loading.gif';
@@ -18,7 +17,7 @@ export default class Connection extends React.Component {
         EXPERIMENTAL: {
             pubsub: true
         },
-        repo: new Repo('/localUser/ipfs-repo'),                                                                                //TODO: create and modify repo
+        repo: 'test',                                                                                //TODO: create and modify repo
         online: true,
         config: {
             Addresses: {
@@ -69,7 +68,7 @@ export default class Connection extends React.Component {
         <div>
             Peer id: {this.state.peer.id}
             {(this.state.online)?<Chatroom ipfs={this.ipfs} usernameHash={this.state.usernameHash} myPeerId={this.state.peer.id}/>:<img src={LoadingImg} alt=""/>}
-            <UploadIPFS/>
+            <UploadIPFS ipfs={this.ipfs}/>
             <DropOut ipfs={this.ipfs}/>
         </div>
       );
