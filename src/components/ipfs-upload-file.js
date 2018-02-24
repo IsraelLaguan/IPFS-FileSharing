@@ -32,7 +32,7 @@ export default class UploadIPFS extends React.Component {
     this.ipfs.files.add(buffer, (err, response) => {
         if (err || !response) {return console.error('ipfs add error', err, response)}
         console.log(response)
-        ipfsId = response[0].hash
+        ipfsId = response.hash
         console.log(ipfsId)
         this.setState({added_file_hash: ipfsId})
     });
